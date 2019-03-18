@@ -32,9 +32,9 @@ def GetAttachments(service, user_id, msg_id, store_dir):
       if 'attachmentId'in part['body']:
         attID = part['body']['attachmentId']
         try:
-          file_database=open('database.json','r' )
+          file_database=open('assets\\database.json','r' )
         except:
-          open("database.json",'w')
+          open("assets\\database.json",'w')
           download_file(service,user_id, msg_id,attID, part)
           break
         raw_data=file_database.read()
@@ -66,15 +66,15 @@ def download_file(service, user_id, msg_id ,attID, part, deleted= False):
     if NOTIFICATIONS:
       plyer.notification.notify( message='в '+PATH+part['filename'],
         app_name='gmail downloader',
-        app_icon='logo.ico',
+        app_icon='assets\\logo.ico',
         title='скачан новый файл' )
     if not deleted:
       update_database(part['filename'],part['body']['size'], msg_id, attID, PATH+part['filename'])
   else: 
-    print('file size > max file size, you can change it in '+ os.path.abspath('database.json'))
+    print('file size > max file size, you can change it in '+ os.path.abspath('assets\\database.json'))
 
 def update_database(filename, fsize, msg_id,  attID, trace):
-  file_database=open('database.json','r' )
+  file_database=open('assets\\database.json','r' )
   raw_data=file_database.read()
   file_database.close()
   data= raw_data.split("\n")
@@ -89,7 +89,7 @@ def update_database(filename, fsize, msg_id,  attID, trace):
         break
   data.append({'name':filename, 'size':fsize,'msgid':msg_id, 'id':attID, 'path':trace})
   file_database.close()
-  file_database= open('database.json','w')
+  file_database= open('assets\\database.json','w')
   for file_meta in data:
     file_database.write(str(file_meta)+'\n')
 
@@ -114,16 +114,16 @@ def check_downloads(service):
 
 def main():
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists('assets\\token.pickle'):
+        with open('assets\\token.pickle', 'rb') as token:
             creds = pickle.load(token)
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file('assets\\credentials.json', SCOPES)
             creds = flow.run_local_server()
-        with open('token.pickle', 'wb') as token:
+        with open('assets\\token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     service = build('gmail', 'v1', credentials=creds)

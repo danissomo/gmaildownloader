@@ -17,7 +17,7 @@ import funcs
 if __name__ == '__main__':
     config = configparser.ConfigParser()
     try:
-      config.read('settings.cfg')
+      config.read('assets\\settings.cfg')
       PATH= config['DEFAULT']['path']
       if not os.path.exists(PATH):
           os.makedirs(PATH)
