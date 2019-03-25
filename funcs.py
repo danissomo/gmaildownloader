@@ -95,7 +95,7 @@ def update_database(filename, fsize, msg_id,  attID, trace):
 
 
 def check_downloads(service):
-  file_database=open('database.json','r' )
+  file_database=open('assets\\database.json','r' )
   raw_data=file_database.read()
   data= raw_data.split("\n")
   if '' in data:
