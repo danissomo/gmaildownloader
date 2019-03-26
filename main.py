@@ -29,8 +29,8 @@ if __name__ == '__main__':
       KEYWORD = config['DEFAULT']['get_msgs_from']
     except:
       print('settings.cfg deleted or corrupted')
-    me= funcs.main()
-    msgs=me.users().messages().list(userId='me',q='from:'+KEYWORD).execute()
-    for mes in msgs['messages'] :  
-        funcs.GetAttachments(me,'me',mes['id'],'')
-    funcs.check_downloads(me)
+    token = funcs.main()
+    msgs=token.users().messages().list(userId='me',q='from:'+KEYWORD).execute()
+    for msg in msgs['messages'] :  
+        funcs.GetAttachments(token,'me',msg['id'],'')
+    funcs.check_downloads(token)
