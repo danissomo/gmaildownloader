@@ -38,19 +38,14 @@ def GetAttachments(service, user_id, msg_id, store_dir):
         try:
           file_database=open(os.getenv('temp')+ '\\database.json','r' )
         except:
-          open(os.getenv('temp')+"\\database.json",'w')
+          file_database= open(os.getenv('temp')+"\\database.json",'w')
+          file_database.write('{}')
+          file_database.close()
           download_file(service,user_id, msg_id,attID, part)
           break
-        raw_data=file_database.read()
-        data= raw_data.split("\n")
-        data.remove('')
+        data=json.load(open(os.getenv('temp')+"\\database.json",'r'))
         for file_meta in data:
-          file_meta= file_meta.replace("'","\"")
-          file_meta=dict(json.loads(file_meta))
-        for file_meta in data:
-          file_meta= file_meta.replace("'","\"")
-          file_meta=dict(json.loads(file_meta))
-          if part['filename'] == file_meta['name']:
+          if part['filename'] == data[file_meta]['name']:
             find=True
             break
         if find:
@@ -82,42 +77,31 @@ def download_file(service, user_id, msg_id ,attID, part, deleted= False):
 
 def update_database(filename, fsize, msg_id,  attID, trace):
   tmp_dir = os.getenv('temp')
-  file_database=open(tmp_dir+'\\database.json','r' )
-  raw_data=file_database.read()
-  file_database.close()
-  data= raw_data.split("\n")
-  if '' in data:
-    data.remove('')
+  file_database= open(tmp_dir+'\\database.json','r' )
+  data=json.load(file_database)
   if len(data)!=0:
     for file_meta in data:
-      file_meta =file_meta.replace("'","\"")
-      file_meta=json.loads(file_meta)
-      if file_meta['path'] != PATH + file_meta['name']:
+      if data[file_meta]['path'] != PATH + data[file_meta]['name']:
         data=[]
         break
-  data.append({'name':filename, 'size':fsize,'msgid':msg_id, 'id':attID, 'path':trace})
+  data[len(data)]={'name':filename, 'size':fsize,'msgid':msg_id, 'id':attID, 'path':trace}
   file_database.close()
   file_database= open(tmp_dir+'\\database.json','w')
-  for file_meta in data:
-    file_database.write(str(file_meta)+'\n')
+  json.dump(data, file_database)
+  file_database.close()
 
 
 def check_downloads(service):
   file_database=open(os.getenv('temp')+ '\\database.json','r' )
-  raw_data=file_database.read()
-  data= raw_data.split("\n")
-  if '' in data:
-    data.remove('')
+  data=json.load( file_database)
   if len(data)!=0:
     for file_meta in data:
-      file_meta =file_meta.replace("'","\"")
-      file_meta=json.loads(file_meta)
       try:
-        open(file_meta['path'],'r')
+        open(data[file_meta]['path'],'r')
       except:
         message = service.users().messages().get(userId='me', id=file_meta['msgid']).execute()
         for part in message['payload']['parts']:
-          if part['filename']==file_meta['name']:
+          if part['filename']==data[file_meta]['name']:
             download_file(service,'me', file_meta['msgid'],file_meta['id'],part, True)
 
 
