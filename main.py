@@ -11,8 +11,8 @@ from googleapiclient.discovery import build
 import base64
 import email
 from apiclient import errors
-import funcs
 
+import funcs
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
