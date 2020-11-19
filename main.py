@@ -16,21 +16,24 @@ import funcs
 
 if __name__ == '__main__':
     config = configparser.ConfigParser()
-    try:
-      config.read('assets\\settings.cfg')
-      PATH= config['DEFAULT']['path']
-      if not os.path.exists(PATH):
-          os.makedirs(PATH)
+    config.read('assets\\settings.cfg')
+    PATH= config['DEFAULT']['path']
+    KEYWORD = config['DEFAULT']['get_msgs_from']
+    KEYWORD = KEYWORD.replace(" ", '')
+    KEYWORD = KEYWORD.split(',')
+    print(KEYWORD)
+    token = funcs.main()
+    for keyword in  KEYWORD:
+      print(keyword)
+      if not os.path.exists(PATH+ "\\" +keyword):
+          os.makedirs(PATH+"\\"+keyword)
       if config['DEFAULT']['notify']=='yes':
         NOTIFICATIONS=True
       else:
         NOTIFICATIONS=False
       MAXSIZE= int(config['DEFAULT']['max_file_size'])
-      KEYWORD = config['DEFAULT']['get_msgs_from']
-    except:
-      print('settings.cfg deleted or corrupted')
-    token = funcs.main()
-    msgs=token.users().messages().list(userId='me',q='from:'+KEYWORD).execute()
-    for msg in msgs['messages'] :  
-        funcs.GetAttachments(token,'me',msg['id'],'')
+      msgs=token.users().messages().list(userId='me',q='from:'+keyword).execute()
+      for msg in msgs['messages'] :  
+          funcs.GetAttachments(token,'me',msg['id'], PATH+"\\"+keyword)
+    
     funcs.check_downloads(token)
